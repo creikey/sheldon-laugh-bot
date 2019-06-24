@@ -12,18 +12,18 @@ import time
 from os import path
 
 USERDATA_FILE = "userdata.json"
-GENERAL_LOL_REGEX = re.compile(r"(.*lol.*)|(.*almao.*)|(.*arofl.*)")
+GENERAL_LOL_REGEX = re.compile(r"(.*lol.*)|(.*almao.*)|(.*arofl.*)", re.IGNORECASE)
 LOL_SCORES = {
-    "\s*lol\s*": 1,
-    "\s*rwalol\s*": 2,
-    "\s*walol\s*": 3,
-    "\s*alol\s*": 4,
-    "\s*rwalmao\s*": 5,
-    "\s*walmao\s*": 6,
-    "\s*almao\s*": 7,
-    "\s*rwarofl\s*": 8,
-    "\s*warofl\s*": 9,
-    "\s*arofl\s*": 10,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)lol($|\s+|\.|,|!|\?|\:|\;)": 1,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)rwalol($|\s+|\.|,|!|\?|\:|\;)": 2,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)walol($|\s+|\.|,|!|\?|\:|\;)": 3,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)alol($|\s+|\.|,|!|\?|\:|\;)": 4,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)rwalmao($|\s+|\.|,|!|\?|\:|\;)": 5,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)walmao($|\s+|\.|,|!|\?|\:|\;)": 6,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)almao($|\s+|\.|,|!|\?|\:|\;)": 7,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)rwarofl($|\s+|\.|,|!|\?|\:|\;)": 8,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)warofl($|\s+|\.|,|!|\?|\:|\;)": 9,
+    r".*(^|\s+|\.|,|!|\?|\:|\;)arofl($|\s+|\.|,|!|\?|\:|\;)": 10,
 }
 
 logging.basicConfig(
@@ -128,7 +128,7 @@ def get_scores(update, context):
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("getscores", get_scores))
 lol_handler = MessageHandler(
-    filters=(Filters.regex(GENERAL_LOL_REGEX)), callback=on_lol_message
+    filters=(Filters.reply & Filters.regex(GENERAL_LOL_REGEX)), callback=on_lol_message
 )
 dispatcher.add_handler(lol_handler)
 
