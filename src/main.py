@@ -62,7 +62,8 @@ def update_dictionary(dictionary: dict, file_name: str) -> dict:
         return dictionary
 
 
-id_to_userdata = {"1234": UserData(4, "cameron reikes", False)}
+#id_to_userdata = {"1234": UserData(4, "cameron reikes", False)}
+id_to_userdata = {}
 
 schedule.every(5).minutes.do(dump_dictionary, id_to_userdata, USERDATA_FILE)
 dump_thread = threading.Thread(target=run_schedule)
