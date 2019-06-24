@@ -1,3 +1,10 @@
+# Telegram persistent data storage
+ids.json
+scores.json
+
+# Telegram bot token
+.token
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
