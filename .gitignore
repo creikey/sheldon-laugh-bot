@@ -1,6 +1,5 @@
 # Telegram persistent data storage
-ids.json
-scores.json
+userdata.json
 
 # Telegram bot token
 .token
