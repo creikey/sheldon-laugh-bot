@@ -86,7 +86,7 @@ def start(update, context):
 
 def on_lol_message(update, context):
     logging.info("lol detected")
-    update.message.reply_text("This is a lol")
+    # update.message.reply_text("This is a lol")
     if update.message.from_user == update.message.reply_to_message.from_user:
         update.message.reply_text(
             "You really thought 🤦‍♂️🤦‍♂️🤦‍♂️ bruhhhh..... bitchass meatbody. You want a ban?"
