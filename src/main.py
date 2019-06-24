@@ -62,7 +62,7 @@ def update_dictionary(dictionary: dict, file_name: str) -> dict:
         return dictionary
 
 
-#id_to_userdata = {"1234": UserData(4, "cameron reikes", False)}
+# id_to_userdata = {"1234": UserData(4, "cameron reikes", False)}
 id_to_userdata = {}
 
 schedule.every(5).minutes.do(dump_dictionary, id_to_userdata, USERDATA_FILE)
@@ -118,9 +118,10 @@ def get_key(key):
 def get_scores(update, context):
     global id_to_userdata
     full_message = f"-- Current lol scores --\n"
-    sorted_ids = sorted(id_to_userdata.keys(), key=lambda t: get_key(t[0]))
-    for current_id in sorted_ids:
-        user: UserData = id_to_userdata[current_id]
+    sorted_userdata = sorted(
+        id_to_userdata.values(), key=lambda x: x.current_score, reverse=True
+    )
+    for user in sorted_userdata:
         banned_str = "banned" if user.banned else "not banned"
         full_message += f"{user.full_name}: {user.current_score}, {banned_str}\n"
     context.bot.send_message(chat_id=update.message.chat_id, text=full_message)
