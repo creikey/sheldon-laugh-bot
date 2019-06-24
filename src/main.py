@@ -12,18 +12,18 @@ import time
 from os import path
 
 USERDATA_FILE = "userdata.json"
-GENERAL_LOL_REGEX = ".*lol.*|.*almao.*|.*arofl.*"
+GENERAL_LOL_REGEX = re.compile(r"(.*lol.*)|(.*almao.*)|(.*arofl.*)")
 LOL_SCORES = {
-    "[ \t]*lol[ \t]*": 1,
-    "[ \t]*rwalol[ \t]*": 2,
-    "[ \t]*walol[ \t]*": 3,
-    "[ \t]*alol[ \t]*": 4,
-    "[ \t]*rwalmao[ \t]*": 5,
-    "[ \t]*walmao[ \t]*": 6,
-    "[ \t]*almao[ \t]*": 7,
-    "[ \t]*rwarofl[ \t]*": 8,
-    "[ \t]*warofl[ \t]*": 9,
-    "[ \t]*arofl[ \t]*": 10,
+    "\s*lol\s*": 1,
+    "\s*rwalol\s*": 2,
+    "\s*walol\s*": 3,
+    "\s*alol\s*": 4,
+    "\s*rwalmao\s*": 5,
+    "\s*walmao\s*": 6,
+    "\s*almao\s*": 7,
+    "\s*rwarofl\s*": 8,
+    "\s*warofl\s*": 9,
+    "\s*arofl\s*": 10,
 }
 
 logging.basicConfig(
@@ -85,13 +85,22 @@ def start(update, context):
 
 
 def on_lol_message(update, context):
+    logging.info("lol detected")
+    update.message.reply_text("This is a lol")
+    if update.message.from_user == update.message.reply_to_message.from_user:
+        update.message.reply_text(
+            "You really thought 🤦‍♂️🤦‍♂️🤦‍♂️ bruhhhh..... bitchass meatbody. You want a ban?"
+        )
+        return
     lol_score = None
+    message_text = update.message.text.lower()
     for lol_regex in LOL_SCORES.keys():
-        if re.match(lol_regex, update.message.text):
+        if re.match(lol_regex, message_text):
             lol_score = LOL_SCORES[lol_regex]
             break
     if lol_score == None:
         logging.error(f"No lol regex matched for: {update.message.text}!")
+        return
     user = update.message.reply_to_message.from_user
     user_id = str(user.id)
     if user_id in id_to_userdata:
@@ -102,15 +111,11 @@ def on_lol_message(update, context):
 
 
 def get_key(key):
-    try:
-        return int(key)
-    except ValueError:
-        return key
+    return int(key)
 
 
 def get_scores(update, context):
     global id_to_userdata
-    print(id_to_userdata)
     full_message = f"-- Current lol scores --\n"
     sorted_ids = sorted(id_to_userdata.keys(), key=lambda t: get_key(t[0]))
     for current_id in sorted_ids:
@@ -122,15 +127,14 @@ def get_scores(update, context):
 
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("getscores", get_scores))
-dispatcher.add_handler(
-    MessageHandler(
-        filters=(Filters.reply & Filters.regex(GENERAL_LOL_REGEX)),
-        callback=on_lol_message,
-    )
+lol_handler = MessageHandler(
+    filters=(Filters.regex(GENERAL_LOL_REGEX)), callback=on_lol_message
 )
+dispatcher.add_handler(lol_handler)
 
 
 updater.start_polling()
+logging.info("Polling...")
 updater.idle()
 
 dump_thread_stop.set()
