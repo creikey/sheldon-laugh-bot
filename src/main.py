@@ -92,6 +92,9 @@ def on_lol_message(update, context):
         update.message.reply_text(
             "You really thought 🤦‍♂️🤦‍♂️🤦‍♂️ bruhhhh..... bitchass meatbody. You want a ban?"
         )
+        logging.info(
+            "User f{update.message.from_user.full_name} with id f{update.message.from_user.id} tried to get alols by replying to own message"
+        )
         return
     lol_score = None
     message_text = update.message.text.lower()
@@ -108,7 +111,9 @@ def on_lol_message(update, context):
         id_to_userdata[user_id].current_score += lol_score
     else:
         id_to_userdata[user_id] = UserData(lol_score, user.full_name, False)
-    logging.info(f"User {user.full_name} gained {lol_score} points!")
+    logging.info(
+        f"User {user.full_name} gained {lol_score} points from user {update.message.from_user.full_name} with id f{update.message.from_user.id}!"
+    )
 
 
 def get_key(key):
