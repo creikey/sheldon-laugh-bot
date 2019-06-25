@@ -1,6 +1,9 @@
 # Telegram persistent data storage
 userdata.json
 
+# Groups bot is allowed to be in
+.groups
+
 # Telegram bot token
 .token
 

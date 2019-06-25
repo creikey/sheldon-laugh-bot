@@ -65,6 +65,10 @@ def update_dictionary(dictionary: dict, file_name: str) -> dict:
 
 # id_to_userdata = {"1234": UserData(4, "cameron reikes", False)}
 id_to_userdata = {}
+allowed_groups = []
+
+with open(GROUPS_FILE, "r") as groups_file:
+    allowed_groups = groups_file.read().split("\n")
 
 schedule.every(5).minutes.do(dump_dictionary, id_to_userdata, USERDATA_FILE)
 dump_thread = threading.Thread(target=run_schedule)
@@ -96,6 +100,23 @@ def on_lol_message(update, context):
         logging.info(
             "User f{update.message.from_user.full_name} with id f{update.message.from_user.id} tried to get alols by replying to own message"
         )
+        return
+
+    if (
+        update.message.from_user.id in id_to_userdata.keys()
+        and id_to_userdata[update.message.from_user.id].banned
+    ) or (
+        update.message.reply_to_message.from_user.id in id_to_userdata.keys()
+        and id_to_userdata[update.message.reply_to_message.from_user.id].banned
+    ):
+        logging.info(
+            "User with ID f{update.message.from_user.id} was banned, cannot do anything"
+        )
+        return
+    if not str(update.message.chat.id) in allowed_groups:
+        logging.info(f"Message from unknown group {update.message.chat.id}")
+        update.message.reply_text("My daddy says I shouldn't talk to strangers 🤨")
+        updater.bot.leave_chat(update.message.chat.id)
         return
     lol_score = None
     message_text = update.message.text.lower()
@@ -137,6 +158,11 @@ def get_group_id(update, context):
     update.message.reply_text(f"Group ID: {update.message.chat.id}")
 
 
+"""
+start - start counting lols
+getgroupid - get the current group's id
+getscores - get the list of current scores
+"""
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("getgroupid", get_group_id))
 dispatcher.add_handler(CommandHandler("getscores", get_scores))
