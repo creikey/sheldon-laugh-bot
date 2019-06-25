@@ -113,7 +113,7 @@ def on_lol_message(update, context):
             "User with ID f{update.message.from_user.id} was banned, cannot do anything"
         )
         return
-    if not str(update.message.chat.id) in allowed_groups:
+    if update.message.chat.id < 0 and not str(update.message.chat.id) in allowed_groups:
         logging.info(f"Message from unknown group {update.message.chat.id}")
         update.message.reply_text("My daddy says I shouldn't talk to strangers 🤨")
         updater.bot.leave_chat(update.message.chat.id)
