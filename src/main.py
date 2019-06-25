@@ -12,6 +12,7 @@ import time
 from os import path
 
 USERDATA_FILE = "userdata.json"
+GROUPS_FILE = ".groups"
 GENERAL_LOL_REGEX = re.compile(r"(.*lol.*)|(.*almao.*)|(.*arofl.*)", re.IGNORECASE)
 LOL_SCORES = {
     r".*(^|\s+|\.|,|!|\?|\:|\;)lol($|\s+|\.|,|!|\?|\:|\;)": 1,
@@ -132,7 +133,12 @@ def get_scores(update, context):
     context.bot.send_message(chat_id=update.message.chat_id, text=full_message)
 
 
+def get_group_id(update, context):
+    update.message.reply_text(f"Group ID: {update.message.chat.id}")
+
+
 dispatcher.add_handler(CommandHandler("start", start))
+dispatcher.add_handler(CommandHandler("getgroupid", get_group_id))
 dispatcher.add_handler(CommandHandler("getscores", get_scores))
 lol_handler = MessageHandler(
     filters=(Filters.reply & Filters.regex(GENERAL_LOL_REGEX)), callback=on_lol_message
