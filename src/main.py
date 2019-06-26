@@ -33,8 +33,11 @@ logging.basicConfig(
 
 
 class UserData(object):
-    def __init__(self, current_score: int, full_name: str, banned: bool):
+    def __init__(
+        self, current_score: int, num_responses: int, full_name: str, banned: bool
+    ):
         self.current_score = current_score
+        self.num_responses = num_responses
         self.full_name = full_name
         self.banned = banned
 
@@ -131,8 +134,9 @@ def on_lol_message(update, context):
     user_id = str(user.id)
     if user_id in id_to_userdata:
         id_to_userdata[user_id].current_score += lol_score
+        id_to_userdata[user_id].num_responses += 1
     else:
-        id_to_userdata[user_id] = UserData(lol_score, user.full_name, False)
+        id_to_userdata[user_id] = UserData(lol_score, 1, user.full_name, False)
     logging.info(
         f"User {user.full_name} gained {lol_score} points from user {update.message.from_user.full_name} with id f{update.message.from_user.id}!"
     )
@@ -154,6 +158,18 @@ def get_scores(update, context):
     context.bot.send_message(chat_id=update.message.chat_id, text=full_message)
 
 
+def get_averages(update, context):
+    global id_to_userdata
+    full_message = f"-- Average lol scores --\n"
+    sorted_userdata = sorted(
+        id_to_userdata.values(), key=lambda x: x.current_score, reverse=True
+    )
+    for user in sorted_userdata:
+        banned_str = "banned" if user.banned else "not banned"
+        full_message += f"{user.full_name}: {round(user.current_score/user.num_responses,2) if user.num_responses else 0}, {banned_str}\n"
+    context.bot.send_message(chat_id=update.message.chat_id, text=full_message)
+
+
 def get_group_id(update, context):
     update.message.reply_text(f"Group ID: {update.message.chat.id}")
 
@@ -162,10 +178,12 @@ def get_group_id(update, context):
 start - start counting lols
 getgroupid - get the current group's id
 getscores - get the list of current scores
+getaverages - get the list of average scores
 """
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("getgroupid", get_group_id))
 dispatcher.add_handler(CommandHandler("getscores", get_scores))
+dispatcher.add_handler(CommandHandler("getscores", get_averages))
 lol_handler = MessageHandler(
     filters=(Filters.reply & Filters.regex(GENERAL_LOL_REGEX)), callback=on_lol_message
 )
